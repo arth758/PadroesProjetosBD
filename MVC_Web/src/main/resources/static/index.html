@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>Login</title>
+    <meta charset="UTF-8" /> '
+    <link href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900|Material+Icons" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/vuetify@1.x/dist/vuetify.min.css" rel="stylesheet" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+    <script>
+        $(document).ready(function() {
+            $("form").submit(function(e) {
+                e.preventDefault()
+
+                var email = $("#user").val().trim(),
+                    password = $("#senha").val().trim()
+
+                $.post(
+                    "/login",
+                    JSON.stringify({
+                        user: email,
+                        senha: password,
+                    }),
+                    function(data) {
+                        if (data.status == 0) {
+                            window.location.href = "/index.html"
+                        } else {
+                            sessionStorage.setItem("user", data.email)
+                            window.location.href = "/home.html"
+                        }
+                    },
+                    "json"
+                )
+            })
+        })
+    </script>
+</head>
+
+<body>
+    <div id="app">
+        <v-app>
+            <v-content>
+                <v-container fluid fill-height>
+                    <v-layout align-center justify-center>
+                        <v-flex xs12 sm8 md4>
+                            <v-card class="elevation-12">
+                                <v-toolbar dark color="primary">
+                                    <v-toolbar-title>Login - Visualização de Peças
+                                    </v-toolbar-title>
+                                </v-toolbar>
+
+                                <v-card-text>
+                                    <v-form id="form" method="post">
+                                        <v-text-field id="user" prepend-icon="person" label="Usuário" type="email"></v-text-field>
+                                        <v-text-field id="senha" prepend-icon="lock" label="Senha" type="password"></v-text-field>
+
+                                        <v-spacer></v-spacer>
+
+                                        <v-btn color="primary" type="submit">Login</v-btn>
+                                    </v-form>
+                                </v-card-text>
+                            </v-card>
+                        </v-flex>
+                    </v-layout>
+                </v-container>
+            </v-content>
+        </v-app>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.x/dist/vue.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vuetify@1.x/dist/vuetify.js"></script>
+    <script>
+        new Vue({
+            el: "#app",
+        })
+    </script>
+</body>
+
+</html>

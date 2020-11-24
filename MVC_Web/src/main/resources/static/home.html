@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>Visualização de Peças</title>
+    <meta charset="UTF-8" />
+    <link href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900|Material+Icons" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/vuetify@1.x/dist/vuetify.min.css" rel="stylesheet" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://unpkg.com/vue-3d-model/dist/vue-3d-model.umd.js"></script>
+
+</head>
+
+<body>
+    <div id="app">
+        <v-tabs color="indigo" slider-color="indigo" class="elevation-2">
+            <v-tab href="#Visualizacao">Visualização</v-tab>
+            <v-tab href="#Pecas">Peças</v-tab>
+
+            <v-tab-item value="Visualizacao">
+                <v-carousel height="93.4vh">
+                    <v-carousel-item v-for="(model, index) in gltfModels" :key="index">
+                        <div class="text-center">
+                            <span class="text-h5 indigo--text">
+                                    {{ model.name }}
+                                    {{ model.link }}
+                            </span>
+                            <model-gltf background-color="#a9f5e1" :src="model.link"></model-gltf>
+                        </div>
+                    </v-carousel-item>
+                </v-carousel>
+            </v-tab-item>
+
+            <v-tab-item value="Pecas">
+                <v-alert class="primary" :value="true">
+                    Peças, cadastro, exclusão e etc
+                </v-alert>
+            </v-tab-item>
+        </v-tabs>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.x/dist/vue.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vuetify@1.x/dist/vuetify.js"></script>
+
+
+    <script>
+        new Vue({
+            el: "#app",
+            data: {
+                gltfModels: []
+            },
+
+            beforeCreate() {
+                $.getJSON("./models.json", (data) => {
+                    data.forEach(item => {
+                        this.gltfModels.push(item)
+                        console.log(item)
+                    });
+                    console.log(this.gltfModels)
+                })
+            }
+        })
+    </script>
+</body>
+
+</html>
+
+<!-- [{ "name": "Peça #1", "link": "https://raw.githubusercontent.com/KurtRodrigues/Project01/master/modelos%203D%20Porta%20avi%C3%A3o/1.2.gltf" }, { "name": "Peça #2", "link": "https://raw.githubusercontent.com/KurtRodrigues/Project01/master/modelos%203D%20Porta%20avi%C3%A3o/2.2.gltf"
+}, { "name": "Peça #3", "link": "https://raw.githubusercontent.com/KurtRodrigues/Project01/master/modelos%203D%20Porta%20avi%C3%A3o/3.2.gltf" }, { "name": "Peça #4", "link": "https://raw.githubusercontent.com/KurtRodrigues/Project01/master/modelos%203D%20Porta%20avi%C3%A3o/4.2.gltf"
+} ] -->
