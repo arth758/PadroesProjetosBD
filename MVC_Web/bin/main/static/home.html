@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>Visualização de Peças</title>
+    <meta charset="UTF-8" />
+    <link href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900|Material+Icons" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/vuetify@1.x/dist/vuetify.min.css" rel="stylesheet" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+    <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
+    <script nomodule src="https://unpkg.com/@google/model-viewer/dist/model-viewer-legacy.js "></script>
+
+    <style>
+        model-viewer {
+            --poster-color: transparent;
+            background-color: #B0BEC5;
+        }
+        
+        .model-name {
+            color: black;
+            font-size: 20px;
+            width: 100vw;
+            text-align: center;
+        }
+        
+        .model-gltf {
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+            height: fit-content;
+            width: fit-content;
+        }
+    </style>
+
+    <script>
+        $("form-add").submit(function(e) {
+            e.preventDefault()
+            console.log("Submit");
+
+            var name = $("#name-add").text().trim(),
+                url = $("#link").text().trim()
+
+            console.log(name, url)
+
+            $.post(
+                "/add",
+                // JSON.stringify({
+                //     name,
+                //     url,
+                // }),
+                // function(data) {
+                //     console.log(data)
+                //     window.location.href = "/home.html"
+                // },
+                // "json"
+            )
+        })
+    </script>
+
+</head>
+
+<body>
+    <div id="app">
+        <v-app style="background-color: #B0BEC5">
+            <v-tabs centered color="blue-grey darken-1" slider-color="blue-grey darken-1" class="elevation-2">
+                <v-tab href="#Visualizacao">Visualização</v-tab>
+                <v-tab href="#Pecas">Peças</v-tab>
+
+                <v-tab-item value="Visualizacao">
+                    <v-carousel :cycle=false height="95vh">
+                        <v-carousel-item v-for="(model, index) in gltfModels" :key="index">
+                            <div class="text-center">
+                                <p class="model-name">{{ model.name }}</p>
+
+                                <model-viewer :src="model.link" camera-controls style="display: block; margin-left: auto; margin-right: auto; height: 84vh; width: 100vw;"></model-viewer>
+                            </div>
+                        </v-carousel-item>
+                    </v-carousel>
+                </v-tab-item>
+
+                <v-tab-item value="Pecas">
+                    <v-card color="#B0BEC5" height="93.4vh">
+                        <v-container>
+                            <v-row align="center" justify="center">
+                                <v-col cols="3"> </v-col>
+                                <v-col cols="6">
+                                    <v-card class="elevation-12">
+                                        <v-toolbar dark color="blue-grey darken-1">
+                                            <v-toolbar-title>Adição de Peças
+                                            </v-toolbar-title>
+                                        </v-toolbar>
+
+                                        <v-card-text>
+                                            <!-- <v-form id="form-add" ref="formAdd" method="post"> -->
+                                            <v-text-field id="nameAdd" name="nameAdd" label="Nome da nova peça" required color="indigo"></v-text-field>
+                                            <v-text-field id="link" label="Link da nova peça (Formato: .gltf)" name="link" required color="indigo"></v-text-field>
+
+                                            <v-spacer></v-spacer>
+
+                                            <v-btn color="indigo" @click="submitAdd" dark>
+                                                Adicionar
+                                            </v-btn>
+                                            <!-- </v-form> -->
+                                        </v-card-text>
+                                    </v-card>
+
+                                    <br>
+
+                                    <v-card class="elevation-12">
+                                        <v-toolbar dark color="blue-grey darken-1">
+                                            <v-toolbar-title>Exclusão de Peças
+                                            </v-toolbar-title>
+                                        </v-toolbar>
+
+                                        <v-card-text>
+                                            <v-form id="form-del" method="post">
+                                                <v-text-field name="name-del" label="Nome da peça" id="name-del" required color="indigo"></v-text-field>
+
+                                                <v-spacer></v-spacer>
+
+                                                <v-btn color="error" type="submit" dark>
+                                                    Remover
+                                                </v-btn>
+                                            </v-form>
+                                        </v-card-text>
+                                    </v-card>
+                                </v-col>
+                                <v-col cols="3"></v-col>
+                            </v-row>
+                        </v-container>
+                    </v-card>
+                </v-tab-item>
+            </v-tabs>
+        </v-app>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.x/dist/vue.js "></script>
+    <script src="https://cdn.jsdelivr.net/npm/vuetify@1.x/dist/vuetify.js "></script>
+    <script src="https://unpkg.com/vue-3d-model/dist/vue-3d-model.umd.js "></script>
+
+
+
+    <script>
+        new Vue({
+            el: "#app ",
+            data: {
+                gltfModels: []
+            },
+            beforeCreate() {
+                $.getJSON("./models.json ", (data) => {
+                    data.forEach(item => {
+                        this.gltfModels.push(item)
+                    })
+                })
+            },
+            methods: {
+                submitAdd() {
+                    var name = $("#nameAdd").val().trim(),
+                        url = $("#link").val().trim()
+
+                    $.post(
+                        "/add",
+                        JSON.stringify({
+                            // gltfModels: JSON.stringify(this.gltfModels),
+                            name,
+                            url,
+                        }),
+                        function(data) {
+                            console.log(data)
+                                // window.location.href = "/home.html"
+                        },
+                        "json"
+                    )
+                }
+            }
+        })
+    </script>
+</body>
+
+</html>
+
+<!-- https://attacomsian.com/blog/java-read-write-json-files -->

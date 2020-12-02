@@ -1,0 +1,11 @@
+Manifest-Version: 1.0
+Implementation-Title: JSON.simple
+Implementation-Version: 3.1.1
+Built-By: wyxerqysan
+Specification-Title: JSON.simple
+Implementation-Vendor-Id: com.github.cliftonlabs
+Created-By: Apache Maven 3.6.3
+Build-Jdk: 1.8.0_212
+Specification-Version: 3.1
+Implementation-URL: https://cliftonlabs.github.io/json-simple/
+

@@ -11,7 +11,9 @@ applicationName = 'app'
 
 defaultTasks = ['clean', 'jar']
 
+
 dependencies {
+	compile files('libs/json-simple-1.1.jar')
 	compile 'com.sparkjava:spark-core:2.3'
 	compile 'com.google.code.gson:gson:1.7.2'
 	compile 'org.json:json:20141113'

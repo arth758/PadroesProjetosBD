@@ -1,0 +1,154 @@
+package hello;
+
+import static spark.Spark.post;
+
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+
+import com.google.gson.Gson;
+
+import org.json.simple.JSONObject;
+import org.json.simple.JSONArray;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
+
+public class Controller {
+
+	private Model model;
+	private String path = "./src/main/resources/models.json";
+
+	public Controller(Model model) {
+		this.model = model;
+	}
+
+	@SuppressWarnings("unchecked")
+	public void login() {
+		post("/login", (request, response) -> {
+			response.header("Access-Control-Allow-Origin", "*");
+
+			org.json.JSONObject json = new org.json.JSONObject(request.body());
+			String email = json.getString("user");
+			String password = json.getString("senha");
+			User user = model.login(email, password);
+
+			if (user != null) {
+				return new Gson().toJson(user);
+			} else {
+				JSONObject jsonObj = new JSONObject();
+				jsonObj.put("status", 0);
+
+				return jsonObj;
+			}
+		});
+
+	}
+
+	@SuppressWarnings("unchecked")
+	public void add() {
+		post("/add", (request, response) -> {
+			response.header("Access-Control-Allow-Origin", "*");
+
+			String name = "";
+			String url = "";
+			String finalJsonFile = "";
+
+			Gson gson = new Gson();
+			JSONParser jsonParser = new JSONParser();
+			JSONArray modelList = null;
+
+			try (FileReader reader = new FileReader(path)) {
+
+				Object obj = jsonParser.parse(reader);
+				modelList = (JSONArray) obj;
+
+			} catch (FileNotFoundException e) {
+				e.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace();
+			} catch (ParseException e) {
+				e.printStackTrace();
+			}
+
+			// New data
+			try {
+				org.json.JSONObject json = new org.json.JSONObject(request.body());
+				name = json.getString("name");
+				url = json.getString("url");
+			} catch (Exception ex) {
+				ex.printStackTrace();
+			}
+
+			// Writing new data to file
+			try {
+				GltfModel model = new GltfModel(name, url);
+				String newJson = gson.toJson(model);
+				modelList.add(newJson);
+
+				try (FileWriter file = new FileWriter(path)) {
+					finalJsonFile += "[";
+
+					for (int i = 0; i < modelList.size(); i++) {
+						finalJsonFile += modelList.get(i).toString();
+						if (i != modelList.size() - 1)
+							finalJsonFile += ",";
+
+					}
+					finalJsonFile += "]";
+					file.write(finalJsonFile);
+					file.flush();
+				} catch (IOException ex) {
+					ex.printStackTrace();
+				}
+
+			} catch (Exception ex) {
+				ex.printStackTrace();
+			}
+
+			return finalJsonFile;
+		});
+	}
+
+	@SuppressWarnings("unchecked")
+	public void delete() {
+		post("/delete", (request, response) -> {
+			response.header("Access-Control-Allow-Origin", "*");
+
+			final String name = "";
+
+			try {
+				org.json.JSONObject json = new org.json.JSONObject(request.body());
+				name = json.getString("name");
+			} catch (Exception ex) {
+				ex.printStackTrace();
+			}
+
+			System.out.println(name);
+
+			Gson gson = new Gson();
+			JSONParser jsonParser = new JSONParser();
+			JSONArray modelList = null;
+
+			try (FileReader reader = new FileReader(path)) {
+
+				Object obj = jsonParser.parse(reader);
+				modelList = (JSONArray) obj;
+
+				modelList.forEach(modelP -> {
+					JSONObject model = (JSONObject) modelP;
+					System.out.println(model.get("name").equals(name));
+				});
+
+			} catch (FileNotFoundException e) {
+				e.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace();
+			} catch (ParseException e) {
+				e.printStackTrace();
+			}
+
+			return true;
+		});
+	}
+}
